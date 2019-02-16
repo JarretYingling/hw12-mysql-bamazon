@@ -5,6 +5,9 @@ const log = require("./config.js").log;
 // get mysql connection
 const db = require("./mysql.js").connection;
 
+// get inquirer questions
+const ask = require("./inquirer.js").ask;
+
 // inclusive min <= random <= inclusive max
 function getRandomIntInclusive(min = 0, max = 1) {
     min = Math.ceil(min);
@@ -42,7 +45,7 @@ const productNames = [
 let inventory;
 
 function resetInventory(counter = 0) {
-    var query = db.query(
+    const query = db.query(
         "UPDATE products SET ? WHERE ?",
         [
             // SET first ?
@@ -70,13 +73,13 @@ function resetInventory(counter = 0) {
         counter++;
         resetInventory(counter);
     } else {
-        getInventory();
+        getInventory(ask(inventory));
     }
     // don't db.end() until all db.query() completed
 }
 
-function getInventory() {
-    var query = db.query(
+function getInventory(callback) {
+    const query = db.query(
         "SELECT item_id, product_name, price, department_name FROM products",
         function (err, queryResponse) {
             if (err) throw err;

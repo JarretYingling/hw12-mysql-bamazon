@@ -5,6 +5,8 @@ const log = require("./config.js").log;
 // global npm install directory
 const npmGlobalInstallDir = require("./config.js").npmGlobalInstallDir;
 
+// get inventory
+const inventory = require("./query.js").inventory;
 const tableColumns = require("./query.js").tableColumns;
 const departmentNames = require("./query.js").departmentNames;
 const productNames = require("./query.js").productNames;
@@ -13,7 +15,8 @@ const productNames = require("./query.js").productNames;
 const inquirer = require(`${npmGlobalInstallDir}inquirer`);
 
 // prompt user
-function ask(funcAfterAnswered) {
+function ask(inventory) {
+    log(productNames);
     inquirer
         .prompt([ // array of question objects
             { // list of products
@@ -26,7 +29,7 @@ function ask(funcAfterAnswered) {
                 name: "howMany",
                 type: "prompt",
                 message: "How many would you like to purchase?",
-                validate: function(answer){
+                validate: function (answer) {
                     let message = `${answer} is not a positive whole number`;
                     if (typeof answer !== 'number') {
                         return message;
@@ -52,7 +55,9 @@ function ask(funcAfterAnswered) {
             } else {
                 console.log(`\nNo worries. Think about it and come back. Thank you.\n`);
             }
-            funcAfterAnswered(answers);
+        }).catch(function (err){
+            if (err) throw err;
+            log("ask() error");
         });
 }
 
