@@ -29,23 +29,26 @@ const departmentNames = [
     "functions"
 ];
 
-const productNames = [
-    "boolean",
-    "number",
-    "string",
-    "array",
-    "object",
-    "undefined",
-    "callback",
-    "closure",
-    "promise",
-    "recursion"
-];
+const getProductNames = () => {
+    return [
+        "boolean",
+        "number",
+        "string",
+        "array",
+        "object",
+        "undefined",
+        "callback",
+        "closure",
+        "promise",
+        "recursion"
+    ];
+};
 
 let inventory;
 
 function resetInventory(counter = 0) {
-    const query = db.query(
+    //const query = 
+    db.query(
         "UPDATE products SET ? WHERE ?",
         [
             // SET first ?
@@ -55,7 +58,7 @@ function resetInventory(counter = 0) {
             },
             // WHERE second ?
             {
-                product_name: productNames[counter]
+                product_name: getProductNames()[counter]
             }
         ],
         function (err, queryResponse) {
@@ -69,25 +72,27 @@ function resetInventory(counter = 0) {
 
     // to enforce syncronous queries
     // call next query at end of current query
-    if (counter < productNames.length - 1) {
+    if (counter < getProductNames.length - 1) {
         counter++;
         resetInventory(counter);
     } else {
-        getInventory(ask(inventory));
+        getInventory();
     }
     // don't db.end() until all db.query() completed
 }
 
-function getInventory(callback) {
-    const query = db.query(
-        "SELECT item_id, product_name, price, department_name FROM products",
+function getInventory() {
+    //const query = 
+    db.query(
+        "SELECT * FROM products",
         function (err, queryResponse) {
             if (err) throw err;
             //log(`getInventory queryResponse:\n${JSON.stringify(queryResponse)}`);
             inventory = queryResponse;
             inventory.forEach(function (element) {
-                log(`ID ${element.item_id} ${element.product_name} ${element.department_name} for: $${element.price}`)
+                log(`ID(${element.item_id}) ${element.product_name} ${element.department_name} --- $${element.price} --- (ONLY ${element.stock_quantity} LEFT)`)
             });
+            ask(inventory);
         }
     );
     // logs actual query syntax
@@ -95,13 +100,13 @@ function getInventory(callback) {
 
     // to enforce syncronous queries
     // call next query at end of current query
-
+    
     // don't db.end() until all db.query() completed
 }
 
 module.exports.tableColumns = tableColumns;
 module.exports.departmentNames = departmentNames;
-module.exports.productNames = productNames;
+module.exports.getProductNames = getProductNames;
 module.exports.resetInventory = resetInventory;
 module.exports.getInventory = getInventory;
-module.exports.inventory = inventory;
+// module.exports.inventory = inventory;

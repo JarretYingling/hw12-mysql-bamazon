@@ -33,7 +33,7 @@ const connection = mysql.createConnection({
 // until connection.end()
 connection.connect(function (err) {
     if (err) throw err;
-    log(`\nWelcom to ${database}\nYou are logged in as id ${connection.threadId}\n`);
+    log("\n\n\nWELCOME TO BAMAZON!\n\nWe have the BEST selection of\nJavascript variables AND functions!!!\n");
     // runSelectQuery();
     // don't connection.end() until all connection.query() completed
 });

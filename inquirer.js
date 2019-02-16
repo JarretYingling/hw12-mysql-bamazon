@@ -6,29 +6,29 @@ const log = require("./config.js").log;
 const npmGlobalInstallDir = require("./config.js").npmGlobalInstallDir;
 
 // get inventory
-const inventory = require("./query.js").inventory;
+// const inventory = require("./query.js").inventory;
 const tableColumns = require("./query.js").tableColumns;
 const departmentNames = require("./query.js").departmentNames;
-const productNames = require("./query.js").productNames;
+const getProductNames = () => require("./query.js").getProductNames;
 
 // require inquirer to get user input
 const inquirer = require(`${npmGlobalInstallDir}inquirer`);
 
 // prompt user
 function ask(inventory) {
-    log(productNames);
+    //log(getProductNames()());
     inquirer
         .prompt([ // array of question objects
             { // list of products
                 name: "whatProduct",
-                type: "list",
-                message: "What product would you like to buy?",
-                choices: productNames
+                type: "rawlist",
+                message: "\nCheck the inventory above and select what product you want below!",
+                choices: getProductNames()
             },
             { // how many
                 name: "howMany",
                 type: "prompt",
-                message: "How many would you like to purchase?",
+                message: "We have XX in stock.\nHow many would you like to purchase?",
                 validate: function (answer) {
                     let message = `${answer} is not a positive whole number`;
                     if (typeof answer !== 'number') {
