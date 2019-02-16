@@ -6,7 +6,7 @@ const log = require("./config.js").log;
 const db = require("./mysql.js").connection;
 
 // get inquirer questions
-const ask = require("./inquirer.js").ask;
+const whatProduct = require("./inquirer.js").whatProduct;
 
 // inclusive min <= random <= inclusive max
 function getRandomIntInclusive(min = 0, max = 1) {
@@ -24,27 +24,37 @@ const tableColumns = [
     "stock_quantity"
 ];
 
-const departmentNames = [
-    "variables",
-    "functions"
-];
-
-const getProductNames = () => {
+const getDepartmentNames = () => {
     return [
-        "boolean",
-        "number",
-        "string",
-        "array",
-        "object",
-        "undefined",
-        "callback",
-        "closure",
-        "promise",
-        "recursion"
+        "variables",
+        "variables",
+        "variables",
+        "variables",
+        "variables",
+        "variables",
+        "functions",
+        "functions",
+        "functions",
+        "functions"
     ];
 };
 
-let inventory;
+const getProductNames = () => {
+    return [
+        "boolean variables",
+        "number variables",
+        "string variables",
+        "array variables",
+        "object variables",
+        "undefined variables",
+        "callback functions",
+        "closure functions",
+        "promise functions",
+        "recursion functions"
+    ];
+};
+
+//let inventory;
 
 function resetInventory(counter = 0) {
     //const query = 
@@ -88,11 +98,10 @@ function getInventory() {
         function (err, queryResponse) {
             if (err) throw err;
             //log(`getInventory queryResponse:\n${JSON.stringify(queryResponse)}`);
-            inventory = queryResponse;
-            inventory.forEach(function (element) {
+            queryResponse.forEach(function (element) {
                 log(`ID(${element.item_id}) ${element.product_name} ${element.department_name} --- $${element.price} --- (ONLY ${element.stock_quantity} LEFT)`)
             });
-            ask(inventory);
+            whatProduct(JSON.parse(JSON.stringify(queryResponse)));
         }
     );
     // logs actual query syntax
@@ -100,12 +109,12 @@ function getInventory() {
 
     // to enforce syncronous queries
     // call next query at end of current query
-    
+
     // don't db.end() until all db.query() completed
 }
 
 module.exports.tableColumns = tableColumns;
-module.exports.departmentNames = departmentNames;
+module.exports.departmentNames = getDepartmentNames;
 module.exports.getProductNames = getProductNames;
 module.exports.resetInventory = resetInventory;
 module.exports.getInventory = getInventory;

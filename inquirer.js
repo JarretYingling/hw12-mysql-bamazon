@@ -8,27 +8,58 @@ const npmGlobalInstallDir = require("./config.js").npmGlobalInstallDir;
 // get inventory
 // const inventory = require("./query.js").inventory;
 const tableColumns = require("./query.js").tableColumns;
-const departmentNames = require("./query.js").departmentNames;
+const getDepartmentNames = require("./query.js").getDepartmentNames;
 const getProductNames = () => require("./query.js").getProductNames;
 
 // require inquirer to get user input
 const inquirer = require(`${npmGlobalInstallDir}inquirer`);
 
-// prompt user
-function ask(inventory) {
-    //log(getProductNames()());
+// prompt user for product
+function whatProduct(inventory) {
     inquirer
         .prompt([ // array of question objects
             { // list of products
                 name: "whatProduct",
                 type: "rawlist",
-                message: "\nCheck the inventory above and select what product you want below!",
+                message: "\nFrom the inventory above, what product would you like to order?\n\nYou selected: ",
                 choices: getProductNames()
-            },
+            }
+        ]).then(function (answers) {
+            /*
+            log("answers:");
+            log(answers);
+            log(typeof inventory);
+            log("inventory:");
+            log(inventory);
+            */
+            let choice = answers.whatProduct.split(" ")[0];
+            //log(choice);
+            let arrIndex = 0;
+            inventory.forEach(function(value, index){
+                //log(value.product_name);
+                if (value.product_name === choice) {
+                    //log(index);
+                    arrIndex = index;
+                    //log(arrIndex);
+                }
+            });
+            //log(`index: ${arrIndex}`);
+            log(`We only have ${inventory[arrIndex].stock_quantity} "${answers.whatProduct}" in stock.\n`);
+            howMany(inventory);
+        }).catch(function (err) {
+            if (err) throw err;
+            log("ask() error");
+        });
+}
+
+// prompt user for quantity
+function howMany(inventory) {
+    inquirer
+        .prompt([ // array of question objects
             { // how many
                 name: "howMany",
                 type: "prompt",
-                message: "We have XX in stock.\nHow many would you like to purchase?",
+                message: "How many would you like to purchase?",
                 validate: function (answer) {
                     let message = `${answer} is not a positive whole number`;
                     if (typeof answer !== 'number') {
@@ -41,8 +72,7 @@ function ask(inventory) {
                         return true;
                     }
                 }
-            },
-            { // confirm how many
+            }, { // confirm how many
                 name: "confirmHowMany",
                 type: "confirm",
                 message: "Are you sure?",
@@ -51,14 +81,18 @@ function ask(inventory) {
         ]).then(function (answers) {
             // if confirm, display inquirerResponse
             if (answers.confirm) {
-                console.log(`You've ordered ${answers.howMany} of the item ${answers.whatProduct}`);
+                log(`You've ordered ${answers.howMany} of the item ${answers.whatProduct}`);
             } else {
-                console.log(`\nNo worries. Think about it and come back. Thank you.\n`);
+                log(`\nNo worries. Think about it and come back. Thank you.\n`);
             }
-        }).catch(function (err){
+        }).catch(function (err) {
             if (err) throw err;
             log("ask() error");
         });
 }
 
-module.exports.ask = ask;
+module.exports.whatProduct = whatProduct;
+
+/*
+
+*/
