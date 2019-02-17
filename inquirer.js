@@ -6,13 +6,10 @@ const log = require("./config.js").log;
 const npmGlobalInstallDir = require("./config.js").npmGlobalInstallDir;
 
 // get mysql connection
-const query = require("./query.js");
+const query = require("./bamazon.js");
 
 // get inventory
-// const inventory = require("./query.js").inventory;
-const tableColumns = require("./query.js").tableColumns;
-const getDepartmentNames = require("./query.js").getDepartmentNames;
-const getProductNames = () => require("./query.js").getProductNames;
+const getProductNameDepts = () => require("./bamazon.js").getProductNameDepts;
 
 // require inquirer to get user input
 const inquirer = require(`${npmGlobalInstallDir}inquirer`);
@@ -31,31 +28,18 @@ function whatProduct(inventory) {
             { // list of products
                 name: "whatProduct",
                 type: "rawlist",
-                message: "\nFrom the inventory above, what product would you like to order?\n\nYou selected: ",
-                choices: getProductNames()
+                message: "\nFrom the inventory above, what product would you like to order?\n\n",
+                choices: getProductNameDepts()
             }
         ]).then(function (answers) {
-            /*
-            log("answers:");
-            log(answers);
-            log(typeof inventory);
-            log("inventory:");
-            log(inventory);
-            */
             let choice = answers.whatProduct.split(" ")[0];
-            //log(choice);
             inventory.forEach(function (value, index) {
-                //log(value.product_name);
                 if (value.product_name === choice) {
-                    //log(index);
-                    //arrIndex = index;
                     productName = inventory[index].product_name;
                     stockQuantity = inventory[index].stock_quantity;
                     price = inventory[index].price;
-                    //log(arrIndex);
                 }
             });
-            //log(`index: ${arrIndex}`);
             productNameDept = answers.whatProduct
             log(`We have ${stockQuantity} "${productNameDept}" in stock.\n`);
             howMany(inventory);
@@ -95,15 +79,14 @@ function howMany(inventory) {
             }
         ]).then(function (answers) {
             // if confirm, display inquirerResponse
-            //log(answers);
             if (answers.confirmHowMany) {
                 orderedQuantity = answers.howMany;
                 newStockQuantity = stockQuantity - orderedQuantity;
-                //log(`${stockQuantity} x $${price} = $${stockQuantity * price}`);
-                log(`\nYou've ordered ${orderedQuantity} ${productNameDept}\nat $${price} each for a total of $${orderedQuantity * price}`);
+                log(`\nYou've ordered ${orderedQuantity} ${productNameDept}\nat $${price} each for a total of $${Math.round(orderedQuantity * price * 100) / 100}`);
                 confirmPurchase();
             } else {
                 log(`\nNo worries. Think about it and come back. Thank you.\n`);
+                viewInventory();
             }
         }).catch(function (err) {
             if (err) throw err;
@@ -122,9 +105,25 @@ function confirmPurchase() {
                 default: true
             }
         ]).then(function (answers) {
-            //log(`\nYou've ordered ${orderedQuantity} ${productNameDept}\nat $${price} each for a total of $${orderedQuantity * price}`);
             query.adjustStockQuantity(newStockQuantity, productName);
-            //log(`\nNo worries. Think about it and come back. Thank you.\n`);
+        }).catch(function (err) {
+            if (err) throw err;
+            log("ask() error");
+        });
+}
+
+// prompt user for product
+function viewInventory() {
+    inquirer
+        .prompt([ // array of question objects
+            { // confirm purchase
+                name: "viewInventory",
+                type: "prompt",
+                message: `\nPress ENTER to view inventory and make another purchase.`,
+                default: true
+            }
+        ]).then(function (answers) {
+            query.getInventory();
         }).catch(function (err) {
             if (err) throw err;
             log("ask() error");
@@ -132,7 +131,3 @@ function confirmPurchase() {
 }
 
 module.exports.whatProduct = whatProduct;
-
-/*
-
-*/

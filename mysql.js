@@ -34,13 +34,7 @@ const connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     log("\n\n\nWELCOME TO BAMAZON!\n\nWe have the BEST selection of\nJavascript variables AND functions!!!\n");
-    // runSelectQuery();
     // don't connection.end() until all connection.query() completed
 });
 
-// singular export
 module.exports.connection = connection;
-
-// multiple exports
-// module.exports.example_01 = example_01;
-// module.exports.example_02 = example_02;
