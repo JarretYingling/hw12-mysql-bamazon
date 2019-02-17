@@ -113,9 +113,43 @@ function getInventory() {
     // don't db.end() until all db.query() completed
 }
 
+function adjustStockQuantity(newStockQuantity, productName) {
+    //const query = 
+
+    log(`ADJUST ${productName} TO: ${newStockQuantity}`)
+    db.query(
+        "UPDATE products SET ? WHERE ?",
+        [
+            // SET first ?
+            {
+                stock_quantity: newStockQuantity
+            },
+            // WHERE second ?
+            {
+                product_name: productName
+            }
+        ],
+        function (err, queryResponse) {
+            if (err) throw err;
+            log(`${queryResponse.affectedRows} item updated\n`);
+            //log(queryResponse);
+        }
+    );
+    // logs actual query syntax
+    //log(`getInventory sql:\n${query.sql}`);
+    getInventory();
+    // to enforce syncronous queries
+    // call next query at end of current query
+    
+    // don't db.end() until all db.query() completed
+}
+
+
+
 module.exports.tableColumns = tableColumns;
 module.exports.departmentNames = getDepartmentNames;
 module.exports.getProductNames = getProductNames;
 module.exports.resetInventory = resetInventory;
 module.exports.getInventory = getInventory;
+module.exports.adjustStockQuantity = adjustStockQuantity;
 // module.exports.inventory = inventory;
